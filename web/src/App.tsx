@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { HttpServiceImplementation } from "./services/http.service";
+import { PostsServiceImplementation } from "./services/posts.service";
+
+const httpService = new HttpServiceImplementation("http://localhost:3000/");
+
+const postsService = new PostsServiceImplementation(httpService);
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [guide, setGuide] = useState("");
+  const [post, setPost] = useState("");
+
+  async function generatePost() {
+    const post = await postsService.generatePost(guide);
+    setPost(post);
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div>{post}</div>
+      <input onChange={(e) => setGuide(e.target.value)} value={guide} />
+      <button onClick={generatePost}>generate post</button>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
