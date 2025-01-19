@@ -9,7 +9,11 @@ export class PostsController {
   ) {}
 
   @Post('/')
-  generatePost(@Body() generatePostDTO: GeneratePostDTO) {
-    return this.postsService.generatePost(generatePostDTO.guide);
+  async generatePost(@Body() generatePostDTO: GeneratePostDTO) {
+    const post = await this.postsService.generatePost(generatePostDTO.guide);
+
+    return {
+      post,
+    };
   }
 }
