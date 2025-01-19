@@ -11,6 +11,7 @@ const postsService = new PostsServiceImplementation(httpService);
 
 function App() {
   const [guide, setGuide] = useState("");
+  // TODO: extract it to custom hook
   const [post, setPost] = useState("");
   const [postLoading, setPostLoading] = useState(false);
 
@@ -24,13 +25,36 @@ function App() {
     }
   }
 
+  async function rewritePost(instruction: string) {
+    try {
+      setPostLoading(true);
+      const newPost = await postsService.rewritePost(post, guide, instruction);
+      setPost(newPost);
+    } finally {
+      setPostLoading(false);
+    }
+  }
+
+  function handleSubmit(
+    event: React.FormEvent<
+      HTMLFormElement & {
+        elements: { rewriteInstruction: HTMLTextAreaElement };
+      }
+    >,
+  ) {
+    event.preventDefault();
+    rewritePost(event.currentTarget.elements.rewriteInstruction.value);
+  }
+
   return (
     <div className="flex w-screen min-h-screen">
       <section className="prose border flex-1 max-w-full p-6">
         {post ? (
-          <Markdown remarkPlugins={[remarkBreaks]}>{post}</Markdown>
+          <Markdown remarkPlugins={[remarkBreaks]} skipHtml={true}>
+            {post}
+          </Markdown>
         ) : (
-          <p className="text-gray-500">Please generate a post</p>
+          <p className="text-gray-500">포스팅을 생성해 주세요</p>
         )}
       </section>
       <section className="w-1/3 max-w-md p-6">
@@ -58,6 +82,30 @@ function App() {
             )}
           </Button>
         </section>
+        {post ? (
+          <form className="mt-8" onSubmit={handleSubmit}>
+            <Textarea
+              name="rewriteInstruction"
+              className="h-24"
+              placeholder="재작성 지시사항을 입력하세요."
+            />
+            <Button
+              disabled={postLoading}
+              className={`relative mt-4 ${
+                postLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
+              }`}
+            >
+              {postLoading ? (
+                <span className="invisible">재작성 하기</span>
+              ) : (
+                "재작성 하기"
+              )}
+              {postLoading && (
+                <span className="absolute left-0 right-0">생성 중...</span>
+              )}
+            </Button>
+          </form>
+        ) : null}
       </section>
     </div>
   );
