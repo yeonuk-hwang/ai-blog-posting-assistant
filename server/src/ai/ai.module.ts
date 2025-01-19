@@ -1,21 +1,19 @@
 import { Module } from '@nestjs/common';
-import { GeminiModel, GeminiModelImplementation } from './gemini/gemini.model';
-import {
-  GeminiService,
-  GeminiServiceImplementation,
-} from './gemini/gemini.service';
+import { AIService } from './ai.interface';
+import { OpenAIService } from './openai/openai.service';
+import { OpenAIModel, OpenAIModelImplentation } from './openai/openai.model';
 
 @Module({
   providers: [
     {
-      provide: GeminiService,
-      useClass: GeminiServiceImplementation,
+      provide: AIService,
+      useClass: OpenAIService,
     },
     {
-      provide: GeminiModel,
-      useClass: GeminiModelImplementation,
+      provide: OpenAIModel,
+      useClass: OpenAIModelImplentation,
     },
   ],
-  exports: [GeminiService],
+  exports: [AIService],
 })
 export class AIModule {}

@@ -1,4 +1,4 @@
-import { Instruction, Message, Role } from '@/ai/ai.interface';
+import { AIService, Instruction, Message, Role } from '@/ai/ai.interface';
 import { GeminiService } from '@/ai/gemini/gemini.service';
 import { EXAMPLES } from '@/contexts/blog-posting';
 import { Inject } from '@nestjs/common';
@@ -10,9 +10,7 @@ export interface PostsService {
 export const PostsService = Symbol('PostsService');
 
 export class PostsServiceImplementation implements PostsService {
-  constructor(
-    @Inject(GeminiService) private readonly aiService: GeminiService,
-  ) {}
+  constructor(@Inject(AIService) private readonly aiService: AIService) {}
 
   generatePost(guide: string): Promise<string> {
     const instructions: Instruction[] = [
