@@ -12,14 +12,20 @@ const postsService = new PostsServiceImplementation(httpService);
 function App() {
   const [guide, setGuide] = useState("");
   const [post, setPost] = useState("");
+  const [postLoading, setPostLoading] = useState(false);
 
   async function generatePost() {
-    const post = await postsService.generatePost(guide);
-    setPost(post);
+    try {
+      setPostLoading(true);
+      const post = await postsService.generatePost(guide);
+      setPost(post);
+    } finally {
+      setPostLoading(false);
+    }
   }
 
   return (
-    <div className="flex w-screen h-screen">
+    <div className="flex w-screen min-h-screen">
       <section className="prose border flex-1 max-w-full p-6">
         {post ? (
           <Markdown remarkPlugins={[remarkBreaks]}>{post}</Markdown>
@@ -35,7 +41,22 @@ function App() {
           value={guide}
         />
         <section className="mt-4">
-          <Button onClick={generatePost}>블로그 포스팅 생성</Button>
+          <Button
+            onClick={generatePost}
+            disabled={postLoading}
+            className={`relative ${
+              postLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
+            }`}
+          >
+            {postLoading ? (
+              <span className="invisible">블로그 포스팅 생성</span>
+            ) : (
+              "블로그 포스팅 생성"
+            )}
+            {postLoading && (
+              <span className="absolute left-0 right-0">생성 중...</span>
+            )}
+          </Button>
         </section>
       </section>
     </div>
