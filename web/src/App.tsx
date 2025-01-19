@@ -3,6 +3,7 @@ import { HttpServiceImplementation } from "./services/http.service";
 import { PostsServiceImplementation } from "./services/posts.service";
 import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import { Button } from "@/components/ui/button";
 
 const httpService = new HttpServiceImplementation("http://localhost:3000/");
 const postsService = new PostsServiceImplementation(httpService);
@@ -22,7 +23,7 @@ function App() {
         <Markdown remarkPlugins={[remarkBreaks]}>{post}</Markdown>
       </div>
       <input onChange={(e) => setGuide(e.target.value)} value={guide} />
-      <button onClick={generatePost}>generate post</button>
+      <Button onClick={generatePost}>generate post</Button>
     </>
   );
 }
