@@ -1,3 +1,6 @@
+# http for test
+*.http
+
 # Logs
 logs
 *.log
