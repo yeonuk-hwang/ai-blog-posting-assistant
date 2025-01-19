@@ -48,7 +48,7 @@ export class OpenAIService implements AIService {
       messages: [...context, question],
     });
 
-    return completion.choices[0].message.content;
+    return completion.choices[0].message.content.trim();
   }
 
   private generateDeveloperInstruction(
