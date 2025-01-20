@@ -11,6 +11,11 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: server
+  IMAGE_TAG: latest
+  ECS_SERVICE: InfrastructureStack-ecsserviceService49E054F7-6TTk4Bouxsp3
+  ECS_CLUSTER: InfrastructureStack-ecscluster7830E7B5-F8WT3Q3wYuAO # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: InfrastructureStackapitaskdefinitionC69BCDB1 # set this to the path to your Amazon ECS task definition
+  CONTAINER_NAME: api-container # set this to the name of the container in the
 
 jobs:
   deploy:
@@ -42,11 +47,27 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          docker build . --target server --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
