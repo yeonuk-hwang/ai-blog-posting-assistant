@@ -7,7 +7,10 @@ import { RewritePostDTO } from './dtos/rewrite-post.dto';
 export class PostsController {
   constructor(
     @Inject(PostsService) private readonly postsService: PostsService,
-  ) {}
+  ) {
+    // NOTE: temporary
+    console.log('init post controller');
+  }
 
   @Post('/generate')
   async generatePost(@Body() generatePostDTO: GeneratePostDTO) {
@@ -27,7 +30,6 @@ export class PostsController {
       guide,
       instruction,
     );
-
     return {
       post,
     };
