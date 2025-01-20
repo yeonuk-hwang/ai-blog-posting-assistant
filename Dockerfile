@@ -11,7 +11,7 @@ RUN pnpm run --filter server build
 RUN pnpm deploy --filter=server --prod /prod/server
 
 FROM base AS server
+RUN apk add --no-cache curl
 COPY --from=build /prod/server /prod/server
 WORKDIR /prod/server
-EXPOSE 8000
 CMD [ "pnpm", "start:prod" ]
