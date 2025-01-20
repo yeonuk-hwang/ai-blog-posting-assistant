@@ -124,6 +124,7 @@ export class InfrastructureStack extends cdk.Stack {
         serverImageRepository,
         "latest",
       ),
+      memoryLimitMiB: 800,
       logging: ecs.LogDrivers.awsLogs({
         logGroup,
         streamPrefix: "server", // 로그 그룹 내에서 로그 스트림의 접두사
