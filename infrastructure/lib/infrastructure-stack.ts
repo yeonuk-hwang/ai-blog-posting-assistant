@@ -6,6 +6,9 @@ import * as elb from "aws-cdk-lib/aws-elasticloadbalancingv2";
 import * as asg from "aws-cdk-lib/aws-autoscaling";
 import * as logs from "aws-cdk-lib/aws-logs";
 import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
+import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
+import * as cloudfrontOrigins from "aws-cdk-lib/aws-cloudfront-origins";
+import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 
 enum SUBNET_GROUP {
@@ -27,6 +30,24 @@ export class InfrastructureStack extends cdk.Stack {
         removalPolicy: cdk.RemovalPolicy.DESTROY,
       },
     );
+
+    const bucket = new s3.Bucket(this, "web", {
+      bucketName: "web-ai-blog-posting",
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      publicReadAccess: false,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const distribution = new cloudfront.Distribution(this, "web-distribution", {
+      defaultBehavior: {
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+        compress: true,
+        origin: new cloudfrontOrigins.S3Origin(bucket),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      },
+      defaultRootObject: "index.html",
+      minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2019,
+    });
 
     new cdk.CfnOutput(this, "server-image-repository-uri", {
       value: serverImageRepository.repositoryUri,
@@ -127,10 +148,11 @@ export class InfrastructureStack extends cdk.Stack {
       memoryLimitMiB: 800,
       logging: ecs.LogDrivers.awsLogs({
         logGroup,
-        streamPrefix: "server", // 로그 그룹 내에서 로그 스트림의 접두사
+        streamPrefix: "server",
       }),
       environment: {
         PORT: "80",
+        FRONT_DOMAIN: distribution.distributionDomainName,
       },
       secrets: {
         OPENAI_API_KEY: ecs.Secret.fromSecretsManager(openAIAPIKeySecret),
