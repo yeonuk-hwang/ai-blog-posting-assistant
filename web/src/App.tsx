@@ -6,11 +6,20 @@ import remarkBreaks from "remark-breaks";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-const httpService = new HttpServiceImplementation("http://localhost:3000/");
+const httpService = new HttpServiceImplementation(
+  import.meta.env.VITE_BASE_URL,
+);
 const postsService = new PostsServiceImplementation(httpService);
 
+const initialGuide = `AI를 활용한 글쓰기에 대한 블로그
+AI를 활용했을 때의 장점, 단점
+AI 글쓰기 서비스 중 유명한 서비스
+전문적인 어투로 작성
+1000자 이상
+`;
+
 function App() {
-  const [guide, setGuide] = useState("");
+  const [guide, setGuide] = useState(initialGuide);
   // TODO: extract it to custom hook
   const [post, setPost] = useState("");
   const [postLoading, setPostLoading] = useState(false);
