@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -11,7 +11,7 @@ RUN pnpm run --filter server build
 RUN pnpm deploy --filter=server --prod /prod/server
 
 FROM base AS server
-RUN apk add --no-cache curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 COPY --from=build /prod/server /prod/server
 WORKDIR /prod/server
 CMD [ "pnpm", "start:prod" ]
