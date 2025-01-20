@@ -9,6 +9,7 @@ import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as cloudfrontOrigins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as s3 from "aws-cdk-lib/aws-s3";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import { Construct } from "constructs";
 
 enum SUBNET_GROUP {
@@ -177,8 +178,24 @@ export class InfrastructureStack extends cdk.Stack {
       },
     );
 
-    const listener = loadBalancer.addListener("HTTP-listener", {
+    loadBalancer.addListener("HTTP-redirect-listener", {
       port: 80,
+      defaultAction: elb.ListenerAction.redirect({
+        protocol: "HTTPS",
+        port: "443",
+        permanent: true,
+      }),
+    });
+
+    const certificate = acm.Certificate.fromCertificateArn(
+      this,
+      "Certificate",
+      "arn:aws:acm:ap-northeast-2:039612868644:certificate/64d52ab5-283d-4cb8-abf4-5b8c8bcb4cf2",
+    );
+
+    const listener = loadBalancer.addListener("HTTPS-listener", {
+      port: 443,
+      certificates: [certificate],
     });
 
     // ECS 서비스 생성
