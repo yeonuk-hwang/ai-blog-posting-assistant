@@ -133,10 +133,7 @@ export class InfrastructureStack extends cdk.Stack {
         PORT: "80",
       },
       secrets: {
-        OPENAI_API_KEY: ecs.Secret.fromSecretsManager(
-          openAIAPIKeySecret,
-          "apiKey",
-        ),
+        OPENAI_API_KEY: ecs.Secret.fromSecretsManager(openAIAPIKeySecret),
       },
       healthCheck: {
         command: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"],
