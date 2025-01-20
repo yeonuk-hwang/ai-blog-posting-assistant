@@ -178,7 +178,7 @@ export class InfrastructureStack extends cdk.Stack {
       },
     );
 
-    loadBalancer.addListener("HTTP-redirect-listener", {
+    loadBalancer.addListener("HTTP-listener", {
       port: 80,
       defaultAction: elb.ListenerAction.redirect({
         protocol: "HTTPS",
@@ -190,7 +190,7 @@ export class InfrastructureStack extends cdk.Stack {
     const certificate = acm.Certificate.fromCertificateArn(
       this,
       "Certificate",
-      "arn:aws:acm:ap-northeast-2:039612868644:certificate/64d52ab5-283d-4cb8-abf4-5b8c8bcb4cf2",
+      "arn:aws:acm:ap-northeast-2:039612868644:certificate/6a19d865-acfe-47e6-9c1a-5791b38998e1",
     );
 
     const listener = loadBalancer.addListener("HTTPS-listener", {
