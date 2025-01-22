@@ -100,7 +100,7 @@ export class InfrastructureStack extends cdk.Stack {
           ec2.InstanceSize.MICRO,
         ),
         minCapacity: 1,
-        maxCapacity: 2,
+        maxCapacity: 1,
         machineImage: ecs.EcsOptimizedImage.amazonLinux2(), // ECS 최적화 AMI
         associatePublicIpAddress: true,
       },
@@ -146,7 +146,7 @@ export class InfrastructureStack extends cdk.Stack {
         serverImageRepository,
         "latest",
       ),
-      memoryLimitMiB: 800,
+      memoryLimitMiB: 400,
       logging: ecs.LogDrivers.awsLogs({
         logGroup,
         streamPrefix: "server",
