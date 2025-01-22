@@ -56,7 +56,7 @@ export class InfrastructureStack extends cdk.Stack {
 
     const vpc = new ec2.Vpc(this, "VPC", {
       ipAddresses: ec2.IpAddresses.cidr("10.16.0.0/16"),
-      maxAzs: 1,
+      maxAzs: 2,
       subnetConfiguration: [
         {
           cidrMask: 20,
@@ -173,7 +173,6 @@ export class InfrastructureStack extends cdk.Stack {
         vpc,
         internetFacing: true,
         vpcSubnets: {
-          onePerAz: true,
           subnetGroupName: SUBNET_GROUP.PUBLIC,
         },
       },
